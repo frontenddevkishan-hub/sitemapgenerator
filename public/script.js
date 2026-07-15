@@ -25,7 +25,14 @@ document.getElementById('crawlForm').addEventListener('submit', async (e) => {
             body: JSON.stringify({ url })
         });
 
-        const data = await response.json();
+        let data;
+        const contentType = response.headers.get("content-type");
+        if (contentType && contentType.indexOf("application/json") !== -1) {
+            data = await response.json();
+        } else {
+            throw new Error(`Server returned HTML instead of JSON (Status ${response.status}). The server crashed or the API endpoint is misconfigured.`);
+        }
+
         if (data.error) {
             throw new Error(data.error);
         }

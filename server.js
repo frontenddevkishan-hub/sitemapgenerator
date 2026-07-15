@@ -16,52 +16,63 @@ app.use(express.json());
 app.use(express.static(resolve(__dirname, 'public')));
 
 // Serve output files for download
-app.use('/output', express.static('output'));
+// On Vercel, the output directory needs to be in /tmp due to read-only filesystem
+app.use('/output', express.static('/tmp'));
 
 const jobs = new Map(); // Store active crawl jobs
 
 app.post('/api/crawl', (req, res) => {
-    const { url } = req.body;
-    if (!url) {
-        return res.status(400).json({ error: 'URL is required' });
+    try {
+        const { url } = req.body;
+        if (!url) {
+            return res.status(400).json({ error: 'URL is required' });
+        }
+
+        const jobId = Date.now().toString();
+        // Use /tmp for writing files on serverless environments
+        const outputDirectory = resolve('/tmp', jobId);
+        
+        // Create base config for the job
+        const configPath = resolve(__dirname, 'config.json');
+        const config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
+        config.startUrl = url;
+        config.outputDirectory = outputDirectory;
+
+        const crawler = new Crawler(config);
+        jobs.set(jobId, { crawler, status: 'running', progress: 0, stats: null });
+
+        // Handle events
+        crawler.on('progress', (data) => {
+            const job = jobs.get(jobId);
+            if (job) {
+                job.progress = data.progress;
+                job.stats = data.stats;
+            }
+        });
+
+        crawler.on('done', (data) => {
+            const job = jobs.get(jobId);
+            if (job) {
+                job.status = 'completed';
+                job.finalData = data;
+            }
+        });
+
+        // Start asynchronously
+        crawler.start().catch(err => {
+            console.error('Crawler failed:', err);
+            const job = jobs.get(jobId);
+            if (job) {
+                job.status = 'failed';
+                job.error = err.message;
+            }
+        });
+
+        res.json({ jobId });
+    } catch (err) {
+        console.error('Failed to initialize crawl:', err);
+        res.status(500).json({ error: err.message });
     }
-
-    const jobId = Date.now().toString();
-    const outputDirectory = resolve(__dirname, 'output', jobId);
-    
-    // Create base config for the job
-    const config = JSON.parse(fs.readFileSync('./config.json', 'utf8'));
-    config.startUrl = url;
-    config.outputDirectory = outputDirectory;
-
-    const crawler = new Crawler(config);
-    jobs.set(jobId, { crawler, status: 'running', progress: 0, stats: null });
-
-    // Handle events
-    crawler.on('progress', (data) => {
-        const job = jobs.get(jobId);
-        if (job) {
-            job.progress = data.progress;
-            job.stats = data.stats;
-        }
-    });
-
-    crawler.on('done', (data) => {
-        const job = jobs.get(jobId);
-        if (job) {
-            job.status = 'completed';
-            job.finalData = data;
-        }
-    });
-
-    // Start asynchronously
-    crawler.start().catch(err => {
-        console.error('Crawler failed:', err);
-        const job = jobs.get(jobId);
-        if (job) job.status = 'failed';
-    });
-
-    res.json({ jobId });
 });
 
 // Server-Sent Events endpoint for real-time progress
