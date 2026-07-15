@@ -1,7 +1,6 @@
 import fs from 'fs';
 import { EventEmitter } from 'events';
 import PQueue from 'p-queue';
-import { chromium } from 'playwright';
 import { SingleBar, Presets } from 'cli-progress';
 import { CrawlerWorker } from './worker.js';
 import { isInternalUrl, isValidUrl } from '../utils/validators.js';
@@ -39,7 +38,6 @@ export class Crawler extends EventEmitter {
 
   async init() {
     fs.mkdirSync(this.config.outputDirectory, { recursive: true });
-    this.browser = await chromium.launch({ headless: true });
     if (this.config.respectRobots) {
       this.robots = await getRobotsTxt(this.config.startUrl);
     }
@@ -154,7 +152,6 @@ export class Crawler extends EventEmitter {
     
     await generateReport(this.stats, this.config.outputDirectory);
 
-    if (this.browser) await this.browser.close();
     logger.success('All outputs generated successfully.');
     this.emit('done', { 
         uniqueCount: urlsArray.length, 

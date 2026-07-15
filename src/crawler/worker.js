@@ -1,60 +1,41 @@
 import { parseHtml } from '../parser/index.js';
 import { logError } from '../report/index.js';
+import axios from 'axios';
 
 export class CrawlerWorker {
   constructor(browser, outputDir) {
-    this.browser = browser;
+    // browser is no longer used, kept for API compatibility
     this.outputDir = outputDir;
   }
 
   async processUrl(url) {
     const startTime = Date.now();
-    let page;
     try {
-      const context = await this.browser.newContext({ ignoreHTTPSErrors: true });
-      page = await context.newPage();
-      
-      // We use 'domcontentloaded' and catch timeouts. Many enterprise sites hang due to WAF or trackers.
-      // If it times out, we still try to extract whatever HTML has been loaded so far.
-      let response = null;
-      try {
-        response = await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 15000 });
-      } catch (gotoErr) {
-        // If it's just a timeout, we ignore it and proceed to extract HTML
-        if (!gotoErr.message.includes('Timeout')) {
-          throw gotoErr;
+      const response = await axios.get(url, {
+        timeout: 15000,
+        maxRedirects: 5,
+        validateStatus: () => true, // don't throw on 4xx/5xx
+        headers: {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36 SitemapGenerator'
         }
-      }
+      });
       
       const responseTime = Date.now() - startTime;
-      const status = response ? response.status() : 200;
+      const status = response.status;
+      
       let redirectCount = 0;
-      if (response) {
-        let req = response.request().redirectedFrom();
-        while (req) {
-          redirectCount++;
-          req = req.redirectedFrom();
-        }
+      let finalUrl = url;
+      if (response.request && response.request.res && response.request.res.responseUrl) {
+          finalUrl = response.request.res.responseUrl;
+          if (finalUrl !== url) redirectCount = 1;
       }
 
       if (status >= 400) {
         throw new Error(`HTTP Error ${status}`);
       }
 
-      // Extract HTML after JS execution
-      const html = await page.content();
-      
-      // Parse out canonical and links
-      const parsedData = parseHtml(html, url);
-
-      let finalUrl = url;
-      // Handle redirects / canonical if needed
-      // If there were redirects, the final finalUrl is page.url()
-      if (page.url() !== url) {
-        finalUrl = page.url();
-      }
-
-      await context.close();
+      const html = typeof response.data === 'string' ? response.data : JSON.stringify(response.data);
+      const parsedData = parseHtml(html, finalUrl);
 
       return {
         success: true,
@@ -64,11 +45,10 @@ export class CrawlerWorker {
         links: parsedData.links,
         responseTime,
         status,
-        redirectCount: redirectCount
+        redirectCount
       };
 
     } catch (err) {
-      if (page) await page.context().close().catch(() => {});
       await logError(`Failed to fetch ${url}: ${err.message}`, this.outputDir);
       return {
         success: false,
