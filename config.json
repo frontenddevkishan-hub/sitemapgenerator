@@ -1,0 +1,11 @@
+{
+  "concurrency": 10,
+  "maxPages": 50,
+  "maxDepth": 100,
+  "timeout": 30000,
+  "respectRobots": true,
+  "followRedirects": true,
+  "retryAttempts": 0,
+  "outputDirectory": "./output/ageas",
+  "mergeSitemaps": true
+}

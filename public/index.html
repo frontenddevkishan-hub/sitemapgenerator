@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enterprise Sitemap Generator</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="background-orb orb-1"></div>
+    <div class="background-orb orb-2"></div>
+    
+    <main class="container">
+        <header class="text-center mb-10">
+            <h1 class="gradient-text text-4xl font-bold mb-4">Sitemap Generator</h1>
+            <p class="text-gray-400">Enter a website URL to generate a comprehensive XML sitemap and deduplicated report.</p>
+        </header>
+
+        <div class="glass-card mb-8">
+            <form id="crawlForm" class="flex flex-col gap-4">
+                <div class="input-group">
+                    <input type="url" id="urlInput" placeholder="https://example.com" required>
+                    <button type="submit" id="submitBtn">Generate</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Progress Section -->
+        <div id="progressSection" class="glass-card hidden mb-8">
+            <h3 class="font-semibold mb-4 text-white">Crawling in Progress...</h3>
+            
+            <div class="progress-bar-container">
+                <div id="progressBar" class="progress-bar"></div>
+            </div>
+            
+            <div class="flex justify-between mt-4 text-sm text-gray-400">
+                <span id="progressText">0% Complete</span>
+                <span id="pagesCrawledText">0 Pages</span>
+            </div>
+        </div>
+
+        <!-- Results Section -->
+        <div id="resultsSection" class="glass-card hidden">
+            <h3 class="font-semibold mb-6 text-white text-xl">Generation Complete</h3>
+            
+            <div class="stats-grid mb-8">
+                <div class="stat-card">
+                    <span class="stat-label">Unique URLs</span>
+                    <span class="stat-value text-green-400" id="statUnique">0</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-label">Duplicates Found</span>
+                    <span class="stat-value text-yellow-400" id="statDuplicates">0</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-label">Broken Pages</span>
+                    <span class="stat-value text-red-400" id="statBroken">0</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-label">Avg. Response Time</span>
+                    <span class="stat-value text-blue-400" id="statTime">0ms</span>
+                </div>
+            </div>
+
+            <div class="downloads-container">
+                <h4 class="font-medium text-gray-300 mb-4">Download Assets</h4>
+                <div class="flex flex-wrap gap-4" id="downloadLinks">
+                    <!-- Links populated by JS -->
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>

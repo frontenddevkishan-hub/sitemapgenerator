@@ -1,0 +1,271 @@
+:root {
+    --primary-color: #6366f1;
+    --primary-hover: #4f46e5;
+    --bg-dark: #0f172a;
+    --card-bg: rgba(30, 41, 59, 0.7);
+    --border-color: rgba(255, 255, 255, 0.1);
+    --text-main: #f8fafc;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: var(--bg-dark);
+    color: var(--text-main);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow-x: hidden;
+}
+
+/* Background Orbs */
+.background-orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(80px);
+    z-index: -1;
+    opacity: 0.5;
+    animation: float 10s infinite ease-in-out alternate;
+}
+
+.orb-1 {
+    width: 400px;
+    height: 400px;
+    background: radial-gradient(circle, #6366f1, #a855f7);
+    top: -100px;
+    left: -100px;
+}
+
+.orb-2 {
+    width: 300px;
+    height: 300px;
+    background: radial-gradient(circle, #3b82f6, #06b6d4);
+    bottom: -50px;
+    right: -50px;
+    animation-delay: -5s;
+}
+
+@keyframes float {
+    0% { transform: translateY(0) scale(1); }
+    100% { transform: translateY(30px) scale(1.05); }
+}
+
+/* Typography */
+.text-center { text-align: center; }
+.mb-10 { margin-bottom: 2.5rem; }
+.mb-8 { margin-bottom: 2rem; }
+.mb-6 { margin-bottom: 1.5rem; }
+.mb-4 { margin-bottom: 1rem; }
+.text-4xl { font-size: 2.25rem; }
+.text-xl { font-size: 1.25rem; }
+.text-sm { font-size: 0.875rem; }
+.font-bold { font-weight: 700; }
+.font-semibold { font-weight: 600; }
+.font-medium { font-weight: 500; }
+.text-gray-400 { color: #94a3b8; }
+.text-gray-300 { color: #cbd5e1; }
+.text-white { color: #ffffff; }
+
+.text-green-400 { color: #4ade80; }
+.text-yellow-400 { color: #facc15; }
+.text-red-400 { color: #f87171; }
+.text-blue-400 { color: #60a5fa; }
+
+.gradient-text {
+    background: linear-gradient(to right, #818cf8, #c084fc);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* Layout */
+.container {
+    width: 100%;
+    max-width: 800px;
+    padding: 2rem;
+    z-index: 1;
+}
+
+.flex { display: flex; }
+.flex-col { flex-direction: column; }
+.justify-between { justify-content: space-between; }
+.gap-4 { gap: 1rem; }
+.flex-wrap { flex-wrap: wrap; }
+.hidden { display: none !important; }
+
+/* Glassmorphism Components */
+.glass-card {
+    background: var(--card-bg);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--border-color);
+    border-radius: 1rem;
+    padding: 2rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.glass-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2), 0 4px 6px -2px rgba(0, 0, 0, 0.1);
+}
+
+/* Form Elements */
+.input-group {
+    display: flex;
+    gap: 1rem;
+}
+
+input[type="url"] {
+    flex: 1;
+    background: rgba(15, 23, 42, 0.6);
+    border: 1px solid var(--border-color);
+    border-radius: 0.75rem;
+    padding: 1rem 1.25rem;
+    color: white;
+    font-size: 1rem;
+    font-family: inherit;
+    transition: all 0.2s ease;
+    outline: none;
+}
+
+input[type="url"]:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+}
+
+button {
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
+    color: white;
+    border: none;
+    border-radius: 0.75rem;
+    padding: 1rem 2rem;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: inherit;
+}
+
+button:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+}
+
+button:active {
+    transform: translateY(1px);
+}
+
+button:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* Progress Bar */
+.progress-bar-container {
+    width: 100%;
+    height: 0.75rem;
+    background: rgba(15, 23, 42, 0.6);
+    border-radius: 9999px;
+    overflow: hidden;
+    position: relative;
+    border: 1px solid var(--border-color);
+}
+
+.progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, #3b82f6, #8b5cf6, #ec4899);
+    width: 0%;
+    transition: width 0.4s ease-out;
+    border-radius: 9999px;
+    position: relative;
+}
+
+.progress-bar::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+    animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+}
+
+/* Stats Grid */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1rem;
+}
+
+.stat-card {
+    background: rgba(15, 23, 42, 0.4);
+    border: 1px solid var(--border-color);
+    border-radius: 0.75rem;
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.stat-label {
+    font-size: 0.875rem;
+    color: #94a3b8;
+}
+
+.stat-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+
+/* Download Buttons */
+.download-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border-color);
+    padding: 0.75rem 1.25rem;
+    border-radius: 0.5rem;
+    color: var(--text-main);
+    text-decoration: none;
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition: all 0.2s;
+}
+
+.download-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+.download-btn.primary {
+    background: rgba(99, 102, 241, 0.1);
+    border-color: var(--primary-color);
+    color: #a5b4fc;
+}
+
+.download-btn.primary:hover {
+    background: rgba(99, 102, 241, 0.2);
+}
+
+@media (max-width: 640px) {
+    .input-group {
+        flex-direction: column;
+    }
+}
