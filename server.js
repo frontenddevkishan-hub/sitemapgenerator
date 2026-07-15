@@ -13,7 +13,7 @@ app.use(cors());
 app.use(express.json());
 
 // Serve static frontend files
-app.use(express.static('public'));
+app.use(express.static(resolve(__dirname, 'public')));
 
 // Serve output files for download
 app.use('/output', express.static('output'));
